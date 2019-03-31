@@ -1,0 +1,15 @@
+<div *ngIf="oeuvre">
+
+  <h2>{{oeuvre.title | uppercase}}</h2>
+  <div><span>id: </span>{{oeuvre.id}}</div>
+  <div>
+      <label>name:
+          <input [(ngModel)]="oeuvre.title" placeholder="title"/>
+        </label>
+      <label>description:  <input [(ngModel)]="oeuvre.description" placeholder="description"/></label>
+        <label>dimension: <input [(ngModel)]="oeuvre.dimension" placeholder="dimension"/></label>
+          <label>enable: <input [(ngModel)]="oeuvre.enable" placeholder="enable"/></label>
+   
+  </div>
+
+</div>

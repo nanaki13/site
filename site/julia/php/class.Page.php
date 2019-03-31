@@ -22,6 +22,15 @@ class Page
   private $themes;
   private $techniques;
   private $data;
+  private $dao;
+  
+   public function dao($dao){
+  	 
+  	$this->dao = $dao;
+  }
+  public function get_dao(){
+  	return $this->dao;
+  }
   
   public function data($data){
   	 
@@ -138,6 +147,7 @@ class Page
 
 	public function echoBody()
     {
+		$themes = $this->themes;	
 		if($this->name == 'image_edit' ||$this->name == 'login'){
 			if($this->name == 'login'){
 				require('login.php');
@@ -185,12 +195,15 @@ class Page
 				require('upload_form.php');
 			}else if($this->name == 'createArtFromPath'){
 				$get_method = ['title','description','date','dimension'];
-				$themes = $this->themes;	
+				
 				$techniques = $this->techniques;
 				$path = $_GET['path'];
 			}
-			
+	
 			if(!$page_set){
+				if(isLogged()){
+					$dao = $this->dao;
+				}
                 if(  file_exists( 'php/'.$this->name.'.php')){
                      $data = $this->get_data();
                      require $this->name.'.php';

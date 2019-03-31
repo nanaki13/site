@@ -6,7 +6,7 @@ class Dao{
 	public function __construct($db){
 		$this->db = $db;		
 	}
-	
+	public function close(){$this->db->close();}
 	public function getAProposText(){
             $sql = "select text,module from page_text where page='apropos' and module in ('text1','text2','title1','title2')";
 
@@ -23,6 +23,10 @@ class Dao{
 		$result2->finalize();
 		return $ret;
 	}
+	public function saveAllThemes($themes){
+	
+		$this->doUpdateList("theme",$themes,"id");		
+	}
 	public  function updatePosition($img){
 		
 		$sql = "update oeuvre_position set row = ".$img->get_row().",column = ".$img->get_column()." where oeuvre_key = ".$img->get_id();
@@ -38,7 +42,8 @@ class Dao{
 				title = '".sql_format($img->get_title())."'
 				,description = '".sql_format($img->get_description())."'
 				,date = '".sql_format($img->get_date())."' 
-				,dimension = '".sql_format($img->get_dimension())."' 		
+				,dimension = '".sql_format($img->get_dimension())."'
+				,theme_key=".$img->get_theme_key()."
 				where id = ".$img->get_id();
 	
 		$this->db->exec($sql);
@@ -118,7 +123,7 @@ class Dao{
 	oeuvre.theme_key	,
 	oeuvre.image_key	,
 	oeuvre.dimension ,
-	theme.name,
+	theme.name theme_name,
 	image_path.path,
 				row,column
 				
@@ -179,9 +184,96 @@ class Dao{
 		$result2->finalize();
 		return $ret;
 	}
+
+	public function getAllOeuvresArray(){
+		$sql = "select * from
+	 oeuvre";
+		$ret= array();
+		$result2 = $this->db->query($sql);
+		$image= array();
 	
+		while($res_ = $result2->fetchArray(SQLITE3_ASSOC)){
+	
+			$imageGallery  = $res_;
+	
+				
+			$ret[]=$imageGallery;
+	
+	
+		}
+		$result2->finalize();
+		return $ret;
+	}
+
+	public function getAllOeuvresArrayWhitValue($key, $value){
+		$sql = "select oeuvre.id	,
+		oeuvre.title	,
+		oeuvre.tech_code	,
+		oeuvre.date	,
+		oeuvre.description	,
+		oeuvre.theme_key	,
+		oeuvre.image_key	,
+		oeuvre.dimension ,
+		theme.name theme_name,
+		image_path.path,
+					row,column
+					
+					from 
+		
+					oeuvre
+					join theme on oeuvre.theme_key = theme.id
+					join image on image.id = oeuvre.image_key
+					join image_path on image.id = image_path.image_key and width=1200
+					left join oeuvre_position on oeuvre_position.oeuvre_key = oeuvre.id where $key = ".sql_format($value);
+		$ret= array();
+		$result2 = $this->db->query($sql);
+		$image= array();
+	
+		while($res_ = $result2->fetchArray(SQLITE3_ASSOC)){
+	
+			$imageGallery  = $res_;
+	
+				
+			$ret[]=$imageGallery;
+	
+	
+		}
+		$result2->finalize();
+		return $ret;
+	}
+
+	public function getAllThemesArray(){
+		$sql = "select theme.*,image_path.path from
+	 theme
+	 join image on image.id = theme.image_key
+	 join image_path on image.id = image_path.image_key and width=1200";
+		$ret= array();
+		$result2 = $this->db->query($sql);
+	
+	
+		while($res_ = $result2->fetchArray(SQLITE3_ASSOC)){
+	
+			$imageGallery  = $res_;
+	
+				
+			$ret[]=$imageGallery;
+	
+	
+		}
+		$result2->finalize();
+		return $ret;
+	}
+	
+	public function updateThemeConfig($theme){
+		print_r($theme);
+		echo '<br/>';
+		echo $theme['id'];
+		$sql = 'INSERT INTO `page_config`(`name`,`parent`,`haveMenu`,`haveSubMenu`,`css`,`js`,`title`,`subTitle`,`haveGallery`) VALUES (NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL);';
+	}
 	public function getAllThemes(){
-		$sql = "select * from theme";
+		$sql = "select 
+		theme.*, page_config.name is not null have_config_page from theme 
+		left join page_config on theme.name = page_config.name";
 		$ret= array();
 		$result2 = $this->db->query($sql);
 	
@@ -294,6 +386,43 @@ class Dao{
 		$sql  = "insert into ".$table."('".implode(array_keys($fields_values),"','")."') values ('".implode($fields_values,"','")."')";
 		return $sql;
 	}
+
+	public static  function sql_update_map($col){
+		return "$col = :$col";
+	}
+	
+	public static function build_update($table,&$fields_values,$id_col){
+		
+		if(count($fields_values)>0){
+			
+			$sql = "update $table set ".implode(array_map("Dao::sql_update_map",array_keys(get_object_vars($fields_values[0]))),",")." where $id_col = :id_where";
+		}
+		return $sql;
+	}
+	public function doUpdateList($table,$entities,$id_col){
+		if(count($entities)>0){
+			$sqlUpsate = Dao::build_update($table,$entities,$id_col);	
+			$stmt = $this->db->prepare($sqlUpsate  );
+			if($stmt){
+				foreach($entities as $value){
+					Dao::doUpdate($table,$value,$id_col,$stmt);
+				}
+			}
+			
+		}
+		
+		
+	}
+	public static  function doUpdate($table,$field_values,$id_col,$stmt){
+		
+	
+		foreach ($field_values as $col => $colValue) {
+			$stmt->bindValue(":$col", $colValue);	
+			
+		}
+		$stmt->bindValue(":id_where", $field_values->$id_col);	
+		$stmt->execute();
+	}
 	
 	public static function build_delete($table){
 		
@@ -302,7 +431,7 @@ class Dao{
 	}
 	
 	public function delete_media($id){
-	echo  $this->getAProposText()['text1'];
+
         $sql = Dao::build_delete('image_path')."where image_key in (select image_key from oeuvre where oeuvre.id = ".$id.")";
        
         $this->db->exec($sql);
@@ -313,6 +442,8 @@ class Dao{
        
         $this->db->exec($sql);
 	}
+	
+	
 	
 }
 ?>

@@ -91,6 +91,14 @@ public function get_height(){
 public function get_width(){
 	return $this->width;
 	}
+public function is_of_theme($theme,$textIf){
+	if( $this->theme_key == $theme->get_id()){
+		return $textIf;
+		
+	}else{
+		return "";
+	}
+}
 public function get_path(){
 	return $this->path;
 	}

@@ -5,6 +5,8 @@ class Theme extends IdName
     private $parent_theme_key;
      private $image_key;
      private $image_path;
+	 private $have_config_page;
+	 private $parent_theme_name;
         
     
     public function get_parent_theme_key(){
@@ -28,6 +30,32 @@ class Theme extends IdName
     public function image_path($image_path){
         $this->image_path = $image_path;
     }
+	
+	
+	 public function get_have_config_page(){
+        return $this->have_config_page ;
+    }
+    
+    public function have_config_page($have_config_page){
+        $this->have_config_page = $have_config_page;
+    }
+    public function get_parent_theme_name(){
+        return $this->parent_theme_name ;
+    }
+    
+    public function parent_theme_name($parent_theme_name){
+        $this->parent_theme_name = $parent_theme_name;
+    }
+	
+	public function is_of_theme($theme,$textIf){
+	if( $this->parent_theme_key == $theme->get_id()){
+		return $textIf;
+		
+	}else{
+		return "";
+	}
+}
+    
     
     
     

@@ -1,0 +1,7 @@
+<p>
+  content works! on veut : {{id}} et {{name}}
+</p>
+<div *ngFor="let o of oeuvres">
+  {{o  | json}}
+  <img src="/rsc{{o.path}}" />
+</div>

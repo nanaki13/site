@@ -26,6 +26,9 @@ class Config{
   		throw new Exception('404');
 	}
 }
+	public static function getDb(){
+		return $db = new SQLite3(__DIR__."/julia.db",SQLITE3_OPEN_READWRITE);
+	}
 
 	
 		
@@ -39,7 +42,10 @@ class Config{
         if($name == 'apropos'){
            
             return $this->dao->getAProposText();
-        }
+        }else if($name == 'administration_theme'){
+				echo 'get data';
+				return  $this->dao->getAllThemes();
+		}
 	}
 	public function findPage($db){
 
@@ -47,7 +53,6 @@ class Config{
 			
 			$havRes = false;
 			$this->page = str_replace("-"," ", sql_format( $this->page));
-			
 			$dao = new Dao($db);
 			$this->dao = $dao;
 			$update_image = getPage() == 'update_image';
@@ -78,7 +83,15 @@ class Config{
 			}
 			
 			$this->config = $dao->getBasePageConfig($this->page,$this->parent);
-			
+			if(isLogged()&& $this->config == false){
+					$havRes = true;	
+					$this->config = [];
+					$this->config['haveGallery']=false;
+					$this->config['haveMenu']=false;
+					$this->config['haveSubMenu']=false;
+					$this->config['name']=$this->page;
+					$this->config['dao']=$dao;
+			}
 			
 			if($this->config != false){
 				
@@ -112,12 +125,14 @@ class Config{
 					$this->config['subMenuItems'] = array(
 							array("ref" => "/admin/images", "name" => "images"),
 							array("ref" => "/admin/upload", "name" => "upload"),
-							array("ref" => "/admin/creation_theme", "name" => "création de theme")
+							array("ref" => "/admin/creation_theme", "name" => "création de theme"),
+							array("ref" => "/admin/administration_theme", "name" => "Administration des de thèmes")
 							
 					);
 				}elseif($this->page == "createArtFromPath"){
-					$themes = $dao->getAllThemes();
+
 					$thechniques =$dao->getAll('technique');
+					$themes = $dao->getAllThemes();
 					$this->config['themes'] = $themes;
 					$this->config['techniques'] = $thechniques;
 				}else{
@@ -134,13 +149,18 @@ class Config{
 					}
 				}
 				if($this->config['haveGallery']){
+					if(isLogged() ){
+						
 					
+						$themes = $dao->getAllThemes();
+						$this->config['themes'] = $themes;
+					}
 					$this->config['gallery'] = $dao->getOeuvres($this->page);
 				
 				}
 				if($this->config['haveMenu']){
 					$this->config['menuItems']  = array(array("ref" => "/accueil", "name" => "Acceuil","img_path" => "/rsc/img/fleur_1.jpg" ));
-					$result2 = $db->query("select * from theme where parent_theme_key is null");
+					$result2 = $db->query("select theme.* from theme join page_config on theme.name = page_config.name where parent_theme_key is null");
 					while($res = $result2->fetchArray(SQLITE3_ASSOC)){
 						$this->config['menuItems'][] = array("ref" => "/".str_replace(" ","-",$res['name'])."", "name" => ucfirst($res['name']) );
 					}
@@ -192,7 +212,7 @@ class Config{
 	}
 	
 	public static function makeItems($nomables){
-        $ret == array();
+        $ret = array();
         foreach($nomables as $nomable){
             $ret[] = array("ref" => "/".str_replace(" ","-",$nomable->get_name())."", "name" => ucfirst($nomable->get_name()), "img" => $nomable->get_image_path());
         }

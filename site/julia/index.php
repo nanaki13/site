@@ -17,7 +17,7 @@ include 'php/function.php';
 try{
   session_start();	
  
-  
+  echo '<h1>page : '.getPage().'</h1>';
   $conf = new Config(getPage(),getSubPage());
   if(getPage()=='admin'  && ! isLogged()){
   	throw new Exception('401');

@@ -1,0 +1,28 @@
+<div class="column">
+      <h2>Themes</h2>
+
+      <ul class="themes">
+        <li *ngFor="let theme of themes"
+          [class.selected]="theme === selectedTheme"
+          (click)="onSelect(theme)">
+          <span class="badge">{{theme.id}}</span> {{theme.name}}
+        </li>
+        <li><button (click)="newTheme()">+</button></li>
+        
+      </ul>
+  
+  </div>
+  <div class="column">
+      <div class="column_fix" >
+      <app-theme-detail  [theme]="selectedTheme"></app-theme-detail>
+      <button (click)="save()">save</button><span>{{result?.status}}</span>
+    </div> 
+ 
+  </div>
+
+   
+   
+
+  
+
+

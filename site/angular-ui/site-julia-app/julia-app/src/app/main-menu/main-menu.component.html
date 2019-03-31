@@ -1,0 +1,10 @@
+<div id="menu">
+    <a class="menu_item" href="/accueil"><img id="menu_fleur" class="menu_fleur" src="/rsc/img/fleur_1.jpg"></a>
+    
+  <div *ngFor="let menu of menusList" (click)=select(menu) class="menu_item">{{menu.id}}:{{menu.name}}</div>
+  <a *ngFor="let menu of menusList" routerLink="/menu/{{menu.id}}/{{menu.name}}" >{{menu.id}}:{{menu.name}}</a>
+</div>
+<!--div id="subMenu">
+    <app-sub-menu [subMenus]="subMenus"></app-sub-menu>
+</div>-->
+

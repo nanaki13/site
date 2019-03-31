@@ -1,0 +1,23 @@
+
+    <h2>Oeuvres</h2>
+    <div class="column">
+      <ul class="oeuvres">
+        <li *ngFor="let oeuvre of oeuvres"
+          [class.selected]="oeuvre === selectedOeuvre"
+          (click)="onSelect(oeuvre)">
+          <span class="badge">{{oeuvre.id}}</span> {{oeuvre.title}}, {{oeuvre.description}}, {{oeuvre.date}}
+        </li>
+        <li><button (click)="newOeuvre()">+</button></li>
+        
+      </ul>
+    </div>
+    <div class="column">
+        <div class="column_fix" >
+      <app-oeuvre-detail [oeuvre]="selectedOeuvre"></app-oeuvre-detail>
+      <button (click)="save()">save</button><span>{{result?.status}}</span>
+    </div>
+  </div>
+
+  
+
+

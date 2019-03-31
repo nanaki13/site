@@ -14,6 +14,17 @@ foreach ($get_method as $name){
 	<input type="text" value="<?php echo $media->get_id() ?>" name="id" hidden="true"/>
 	<input type="text" value="<?php echo getPage() ?>" name="page_red" hidden="true"/>
 	<input type="submit" value="OK"/>
+	<label for="theme">theme</label><select name="theme_key">
+	
+	 <?php 
+	
+	 foreach ($themes as $theme){
+	 	
+	 ?> <option <?php echo $media->is_of_theme($theme,"selected")?> value="<?php echo $theme->get_id()?>"><?php echo $theme->get_name()?></option>
+	 <?php 
+}
+?>
+		</select> 
 	</form>
 	<form method="post" action="/delete_media">
 	<input type="text" value="<?php echo $media->get_id() ?>" name="id" hidden="true"/><input type="submit" value="DELETE"/><input type="text" value="<?php echo getPage() ?>" name="page_red" hidden="true"/></form>

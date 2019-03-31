@@ -1,0 +1,18 @@
+<div id="subMenu">
+  <p>
+    sub menu works!
+  </p>
+  <ng-container *ngIf="subMenus">
+   
+    <ng-container *ngFor="let menu of subMenus">
+        <ng-container>
+          <div  class="subMenuItem" >
+            <div><img src="/rsc/{{menu.path}}"></div>
+            <a routerLink="/content/{{menu.id}}/{{menu.name}}" >{{menu.name}}{{menu | json}}</a>
+          </div>
+        </ng-container>
+        <div *ngIf="count()" class="break" >COUCOU</div>
+    </ng-container>
+      
+  </ng-container>
+</div>

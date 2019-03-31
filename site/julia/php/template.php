@@ -28,9 +28,6 @@ Appuyant mes recherches sur le pattern, la répétition du motif à travers le d
 
 if(isset($_SESSION['logged']))
   	require 'logout.php';
- 
-//   	echo 'not logged';
-//   }
    ?>
 <?php echo $page->echoJs() ?>
 </body>
